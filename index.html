@@ -52,21 +52,19 @@
     const detail = document.getElementById('detail');
     const calcBtn = document.getElementById('calc');
     const resetBtn = document.getElementById('reset');
-    const downloadBtn = document.getElementById('download');
 
     function pad(n){return String(n).padStart(2,'0')}
 
     function computeStart(leaveTime){
-      // leaveTime: "HH:MM"
       if(!leaveTime) return {start: null, extra:0};
       const [hh, mm] = leaveTime.split(':').map(x=>parseInt(x,10));
       const leaveMinutes = hh*60 + mm;
-      const threshold = 0*60 + 30; // 00:30 = 30 minutes
+      const threshold = 0*60 + 30; // 00:30
       const standardStart = 11*60; // 11:00
       if(leaveMinutes <= threshold){
         return {startMinutes: standardStart, extra: 0};
       } else {
-        const extra = leaveMinutes - threshold; // phút cộng thêm
+        const extra = leaveMinutes - threshold;
         return {startMinutes: standardStart + extra, extra};
       }
     }
@@ -89,11 +87,8 @@
     calcBtn.addEventListener('click', render);
     resetBtn.addEventListener('click', ()=>{ leave.value = '00:00'; render(); });
 
-   
-    // realtime khi thay đổi
     leave.addEventListener('change', render);
 
-    // khởi tạo
     render();
   </script>
 </body>
