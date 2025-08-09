@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KARAOKE RITA</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#ef4444;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#071026 0%, #071b2e 100%);color:#e6eef8}
+    .wrap{width:min(720px,94%);background:var(--card);border-radius:14px;padding:28px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 14px;font-size:28px;letter-spacing:1px}
+    .row{display:flex;gap:12px;align-items:center;margin:12px 0}
+    label{min-width:120px;color:var(--muted)}
+    input[type=time]{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:8px;color:inherit}
+    .result{margin-top:18px;padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
+    .big{font-size:30px;font-weight:600;color:red}
+    .note{color:var(--muted);font-size:13px;margin-top:8px}
+    .controls{display:flex;gap:10px;margin-top:16px}
+    button{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:white;cursor:pointer}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>KARAOKE RITA</h1>
+
+    <div class="row">
+      <label for="leave">Chọn giờ về:</label>
+      <input id="leave" type="time" step="60" value="00:00">
+    </div>
+
+    <div class="result" id="result">
+      <div>Giờ vào làm ngày hôm sau:</div>
+      <div class="big" id="start">--:--</div>
+      <div class="note" id="detail">Giờ tiêu chuẩn làm việc: 11:00. Nếu giờ về trước hoặc bằng 00:30 thì giữ nguyên 11:00. Nếu muộn hơn 00:30 thì mỗi phút muộn sẽ cộng thêm vào giờ vào làm.</div>
+    </div>
+
+    <div class="controls">
+      <button id="calc">Tính</button>
+      <button class="secondary" id="reset">Đặt lại</button>
+       </div>
+
+    <footer>Ghi chú: ĐI LÀM ĐÚNG GIỜ.</footer>
+  </div>
+
+  <script>
+    // Logic tính toán
+    const leave = document.getElementById('leave');
+    const startEl = document.getElementById('start');
+    const detail = document.getElementById('detail');
+    const calcBtn = document.getElementById('calc');
+    const resetBtn = document.getElementById('reset');
+    const downloadBtn = document.getElementById('download');
+
+    function pad(n){return String(n).padStart(2,'0')}
+
+    function computeStart(leaveTime){
+      // leaveTime: "HH:MM"
+      if(!leaveTime) return {start: null, extra:0};
+      const [hh, mm] = leaveTime.split(':').map(x=>parseInt(x,10));
+      const leaveMinutes = hh*60 + mm;
+      const threshold = 0*60 + 30; // 00:30 = 30 minutes
+      const standardStart = 11*60; // 11:00
+      if(leaveMinutes <= threshold){
+        return {startMinutes: standardStart, extra: 0};
+      } else {
+        const extra = leaveMinutes - threshold; // phút cộng thêm
+        return {startMinutes: standardStart + extra, extra};
+      }
+    }
+
+    function render(){
+      const val = leave.value;
+      const res = computeStart(val);
+      if(!val){ startEl.textContent = '--:--'; detail.textContent = 'Vui lòng chọn giờ về.'; return }
+      const sm = res.startMinutes;
+      const h = Math.floor(sm / 60) % 24;
+      const m = sm % 60;
+      startEl.textContent = pad(h) + ':' + pad(m);
+      if(res.extra === 0){
+        detail.textContent = '';
+      } else {
+        detail.textContent = `Giờ về ${val} → Muộn ${res.extra} phút so với 00:30 → Giờ vào làm: ${pad(h)}:${pad(m)} (11:00 + ${res.extra} phút).`;
+      }
+    }
+
+    calcBtn.addEventListener('click', render);
+    resetBtn.addEventListener('click', ()=>{ leave.value = '00:00'; render(); });
+
+   
+    // realtime khi thay đổi
+    leave.addEventListener('change', render);
+
+    // khởi tạo
+    render();
+  </script>
+</body>
+</html>
