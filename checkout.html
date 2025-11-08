@@ -59,7 +59,7 @@
       if(!leaveTime) return {start: null, extra:0};
       const [hh, mm] = leaveTime.split(':').map(x=>parseInt(x,10));
       const leaveMinutes = hh*60 + mm;
-      const threshold = 0*60 + 30; // 00:30
+      const threshold = 0*60 + 00; // 00:30
       const standardStart = 11*60; // 11:00
       if(leaveMinutes <= threshold){
         return {startMinutes: standardStart, extra: 0};
@@ -80,7 +80,7 @@
       if(res.extra === 0){
         detail.textContent = '';
       } else {
-        detail.textContent = `Giờ về ${val} → Muộn ${res.extra} phút so với 00:30 → Giờ vào làm: ${pad(h)}:${pad(m)} (11:00 + ${res.extra} phút).`;
+        detail.textContent = `Giờ về ${val} → Muộn ${res.extra} phút so với 00:00 → Giờ vào làm: ${pad(h)}:${pad(m)} (11:00 + ${res.extra} phút).`;
       }
     }
 
